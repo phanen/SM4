@@ -153,11 +153,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="sm4.cpp" />
+    <ClCompile Include="sm4_v4.cpp" />
+    <ClCompile Include="sm4_v1.cpp" />
     <ClCompile Include="sm4test.cpp" />
+    <ClCompile Include="sm4_v2.cpp" />
+    <ClCompile Include="sm4_v3.cpp" />
+    <ClCompile Include="sm4_v5.cpp" />
+    <ClCompile Include="util.cpp" />
+    <ClCompile Include="wk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sm4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sm4_SIMD.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
