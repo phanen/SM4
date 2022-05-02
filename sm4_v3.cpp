@@ -5,47 +5,79 @@
 //// your machine should be LE
 //
 //#include "sm4.h"
+//#include "lkup_table.h"
+//
+//
 //static inline uint8_t sm4_Sbox_get(uint8_t inch)
 //{
 //	return SboxTable_1D[inch];
 //}
 //
 //
-////  T(.) := L(tau(.))
-////  [in]: 32 bits unsigned value;
+////static inline uint32_t sm4_func_T(uint8_t* p)
+////{
+////	uint32_t T0 = Table0[*p];
+////	uint32_t T1 = Table1[*(p + 1)];
+////	uint32_t T2 = Table2[*(p + 2)];
+////	uint32_t T3 = Table3[*(p + 3)];
+////	return (T3 ^ T2) ^ (T1 ^ T0);
+////}
+//
+//
 //static inline uint32_t sm4_func_T(uint32_t in)
 //{
-//	uint32_t s_o = 0, c = 0;
+//	//uint32_t T3 = Table3[uint8_t(in >> 24)];
+//	//uint32_t T2 = Table2[uint8_t(in >> 16)];
+//	//uint32_t T1 = Table1[uint8_t(in >> 8)];
+//	//uint32_t T0 = Table0[uint8_t(in)];
 //
-//	// non-linear func-tau
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 24)) << 24;
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 16)) << 16;
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 8)) << 8;
-//	s_o |= sm4_Sbox_get(uint8_t(in));
-//
-//	// linear func-L 
-//	return s_o ^ (ROT_SHL(s_o, 2)) ^ (ROT_SHL(s_o, 10)) ^ (ROT_SHL(s_o, 18)) ^ (ROT_SHL(s_o, 24));
-//
+//	uint8_t* p = (uint8_t*)&in;
+//	uint32_t T0 = Table0[*(p)];
+//	uint32_t T1 = Table1[*(p + 1)];
+//	uint32_t T2 = Table2[*(p + 2)];
+//	uint32_t T3 = Table3[*(p + 3)];
+//	return (T3 ^ T2) ^ (T1 ^ T0);
 //}
 //
-//
-//
-//// Calculating round encryption key.
-//// args:    [in] a: a is a 32 bits unsigned value;
-//// return: sk[i]: i{0,1,2,3,...31}
 //static inline uint32_t sm4_func_T_key(uint32_t in)
 //{
-//	uint32_t s_o = 0;
-//
-//	// non-linear func-tau
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 24)) << 24;
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 16)) << 16;
-//	s_o |= sm4_Sbox_get(uint8_t(in >> 8)) << 8;
-//	s_o |= sm4_Sbox_get(uint8_t(in));
-//
-//	// linear func-L'
-//	return s_o ^ (ROT_SHL(s_o, 13)) ^ (ROT_SHL(s_o, 23));
+//	uint8_t* p = (uint8_t*)&in;
+//	uint32_t T0 = T0_key[*(p)];
+//	uint32_t T1 = T1_key[*(p + 1)];
+//	uint32_t T2 = T2_key[*(p + 2)];
+//	uint32_t T3 = T3_key[*(p + 3)];
+//	return (T3 ^ T2) ^ (T1 ^ T0);
 //}
+//
+//
+////static inline uint32_t sm4_func_T(uint32_t in)
+////{
+////	uint32_t s_o = 0, c = 0;
+////
+////	// non-linear func-tau
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 24)) << 24;
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 16)) << 16;
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 8)) << 8;
+////	s_o |= sm4_Sbox_get(uint8_t(in));
+////
+////	// linear func-L 
+////	return s_o ^ (ROT_SHL(s_o, 2)) ^ (ROT_SHL(s_o, 10)) ^ (ROT_SHL(s_o, 18)) ^ (ROT_SHL(s_o, 24));
+////
+////}
+//
+////static inline uint32_t sm4_func_T_key(uint32_t in)
+////{
+////	uint32_t s_o = 0;
+////
+////	// non-linear func-tau
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 24)) << 24;
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 16)) << 16;
+////	s_o |= sm4_Sbox_get(uint8_t(in >> 8)) << 8;
+////	s_o |= sm4_Sbox_get(uint8_t(in));
+////
+////	// linear func-L'
+////	return s_o ^ (ROT_SHL(s_o, 13)) ^ (ROT_SHL(s_o, 23));
+////}
 //
 //
 //// key <-- 4 * 32 = 128 
@@ -190,6 +222,6 @@
 //
 //	printf("Total Time:%.9fs\n\n", duration);
 //	printf("Latency:%.9fs\n\n", duration / double(trials));
-//	printf("Thoughoutput:%.9f MB/s \n\n",16 *  double(trials) / duration / 1024 /1024);
+//	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(trials) / duration / 1024 / 1024);
 //
 //}

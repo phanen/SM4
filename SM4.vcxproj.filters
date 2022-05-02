@@ -39,15 +39,19 @@
     <ClCompile Include="sm4_v5.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="lkup_table.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sm4_v6.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sm4_v7.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sm4.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="sm4_SIMD.h">
-      <Filter>头文件</Filter>
-    </None>
   </ItemGroup>
 </Project>

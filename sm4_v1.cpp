@@ -1,5 +1,4 @@
 //
-//
 //#include "sm4.h"
 //static inline uint8_t sm4_Sbox_get(uint8_t inch)
 //{
@@ -23,7 +22,7 @@
 //	b[2] = sm4_Sbox_get(a[2]);
 //	b[3] = sm4_Sbox_get(a[3]);
 //	B2W(b, bb, 0);
-//
+//	
 //	// linear func-L 
 //	c = bb ^ (ROT_SHL(bb, 2)) ^ (ROT_SHL(bb, 10)) ^ (ROT_SHL(bb, 18)) ^ (ROT_SHL(bb, 24));
 //	return c;

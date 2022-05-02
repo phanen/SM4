@@ -26,7 +26,15 @@
 dz;
 
 
-
+#define dump_wx(a)\
+	for (size_t i = 0; i < 8; i++)\
+	{\
+		for (size_t j = 0; j < 4; j++)\
+		{\
+			printf("0x%08x ", (a)[(i << 2) + j]);\
+		}\
+		dz;\
+	}\
 
 #define B2W(b,w,i)                           \
 {                                                  \
@@ -47,6 +55,21 @@ dz;
 // rotate shift left marco
 #define  BYTE_SHL(x,n) (((x) & 0xFFFFFFFF) << n)
 #define	 ROT_SHL(x,n) (BYTE_SHL((x),n) | ((x) >> (32 - n)))
+
+
+
+#define MM256_PACK0_EPI32(a, b, c, d)                  \
+    _mm256_unpacklo_epi64(_mm256_unpacklo_epi32(a, b), \
+                          _mm256_unpacklo_epi32(c, d))
+#define MM256_PACK1_EPI32(a, b, c, d)                  \
+    _mm256_unpackhi_epi64(_mm256_unpacklo_epi32(a, b), \
+                          _mm256_unpacklo_epi32(c, d))
+#define MM256_PACK2_EPI32(a, b, c, d)                  \
+    _mm256_unpacklo_epi64(_mm256_unpackhi_epi32(a, b), \
+                          _mm256_unpackhi_epi32(c, d))
+#define MM256_PACK3_EPI32(a, b, c, d)                  \
+    _mm256_unpackhi_epi64(_mm256_unpackhi_epi32(a, b), \
+                          _mm256_unpackhi_epi32(c, d))
 
 
 
