@@ -226,30 +226,33 @@ uint32_t rk[32]{};
 
 // 4 elems make up a whole plain, 32 = 8 * 4
 // so I reserve 8 plains
-uint32_t input[32]{};
+
+
 uint32_t output[32]{};
 
-constexpr size_t trials = 20000000 / 8, threads_num = 8;
+constexpr size_t trials = 200000000 / 8, threads_num = 16;
+uint32_t input[threads_num][32]{};
 
 void task(int i) {
 	for (size_t ct = 0; ct < trials / threads_num; ct++)
 	{
-		sm4_crypt_enc(rk, input, input);
+		sm4_crypt_enc(rk, input[i], input[i]);
 	}
 }
 
-
-
 int main(int argc, char** argv)
 {
-	for (size_t i = 0; i < 32; )
-	{
-		input[i++] = 0x01234567;
-		input[i++] = 0x89abcdef;
-		input[i++] = 0xfedcba98;
-		input[i++] = 0x76543210;
-	}
 
+	for (size_t id = 0; id < threads_num; id++)
+	{
+		for (size_t i = 0; i < 32; )
+		{
+			input[id][i++] = 0x01234567;
+			input[id][i++] = 0x89abcdef;
+			input[id][i++] = 0xfedcba98;
+			input[id][i++] = 0x76543210;
+		}
+	}
 
 	sm4_gen_rk(rk, key);
 
@@ -263,23 +266,16 @@ int main(int argc, char** argv)
 		);
 	}
 
-	for (size_t i = 0; i < trials; i++)
-		sm4_crypt_enc(rk, input, input);
-
-
 	for (size_t i = 0; i < threads_num; i++)
-	{
 		threads_lst[i].join();
-	}
 
 	auto t2{ std::chrono::system_clock::now() };
-	
 	double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() * 1e-9;
 
 	// dump_wx(input);
 	constexpr size_t con_trials = trials * 8;
-
 	printf("Total Time:%.9fs\n\n", duration);
-	printf("Latency:%.9fs\n\n", duration / double(con_trials * threads_num));
-	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(con_trials * threads_num) / duration / 1024 / 1024);
+	printf("Latency:%.9fs\n\n", duration / double(con_trials));
+	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(con_trials) / duration / 1024 / 1024);
+
 }
