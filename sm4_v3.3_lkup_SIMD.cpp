@@ -242,7 +242,7 @@
 //
 //	sm4_gen_rk(rk, key);
 //	
-//	size_t trials = 1000000;
+//	size_t trials = 100000000;
 //	auto t1{ std::chrono::system_clock::now() };
 //
 //
@@ -256,6 +256,7 @@
 //	double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() * 1e-9;
 //	
 //	// dump_wx(input);
+//	printf("The encrpt times:%lld\n\n", trials * 8);
 //	printf("Total Time:%.9fs\n\n", duration);
 //	printf("Latency:%.9fs\n\n", duration / double(trials * 8));
 //	printf("Thoughoutput:%.9f MB/s \n\n",16 * double(trials * 8) / duration / 1024 / 1024);

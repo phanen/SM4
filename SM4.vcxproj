@@ -154,14 +154,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lkup_table.h" />
-    <ClCompile Include="sm4_v4.cpp" />
-    <ClCompile Include="sm4_v1.cpp" />
-    <ClCompile Include="sm4test.cpp" />
-    <ClCompile Include="sm4_v2.cpp" />
-    <ClCompile Include="sm4_v3.cpp" />
-    <ClCompile Include="sm4_v5.cpp" />
-    <ClCompile Include="sm4_v6.cpp" />
-    <ClCompile Include="sm4_v7.cpp" />
+    <ClCompile Include="sm4.cpp" />
+    <ClCompile Include="sm4_v3.2_thread.cpp" />
+    <ClCompile Include="sm4_v1_origin.cpp" />
+    <ClCompile Include="sm4_v2_loop_unroll.cpp" />
+    <ClCompile Include="sm4_v3.1_lkup.cpp" />
+    <ClCompile Include="sm4_v4_lkup_thread.cpp" />
+    <ClCompile Include="sm4_v3.3_lkup_SIMD.cpp" />
+    <ClCompile Include="sm4_v5_merge.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="wk.cpp" />
   </ItemGroup>

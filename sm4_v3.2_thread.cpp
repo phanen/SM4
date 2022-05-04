@@ -157,7 +157,9 @@
 //
 //
 //
-//constexpr size_t threads_num = 12;
+//constexpr size_t threads_num = 16;
+//constexpr size_t trials_per_thread = 10000000;
+//constexpr size_t trials = threads_num * trials_per_thread;
 //
 //
 //uint32_t key[4]{ 0x01234567,0x89abcdef,0xfedcba98,0x76543210 };
@@ -169,11 +171,8 @@
 //uint32_t input[threads_num][4]{};
 //uint32_t output[threads_num][4]{};
 //
-//
-//constexpr size_t ct = 0, trials = 200000000;
-//
 //void task(int i) {
-//	for (size_t ct = 0; ct < trials / threads_num; ct++)
+//	for (size_t ct = 0; ct < trials_per_thread; ct++)
 //	{
 //		sm4_crypt_enc(rk, input[i], input[i]);
 //	}
@@ -227,6 +226,7 @@
 //	//}
 //
 //
+//	printf("The encrpt times:%lld\n\n", trials);
 //	printf("Total Time:%.9fs\n\n", duration);
 //	printf("Latency:%.9fs\n\n", duration / double(trials));
 //	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(trials) / duration / 1024 / 1024);

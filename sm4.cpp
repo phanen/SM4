@@ -224,35 +224,69 @@ uint32_t key[4]{ 0x01234567,0x89abcdef,0xfedcba98,0x76543210 };
 uint32_t rk[32]{};
 
 
+
+constexpr size_t threads_num = 12;
+constexpr size_t trials_per_thread = 1000000;
+constexpr size_t trials = threads_num * trials_per_thread * 8;
+
 // 4 elems make up a whole plain, 32 = 8 * 4
 // so I reserve 8 plains
 
-
-uint32_t output[32]{};
-
-constexpr size_t trials = 200000000 / 8, threads_num = 16;
+#define mutex
+#ifdef mutex
 uint32_t input[threads_num][32]{};
+uint32_t output[threads_num][32]{};
+
+#else
+uint32_t input[32]{};
+uint32_t output[32]{};
+#endif
+
 
 void task(int i) {
-	for (size_t ct = 0; ct < trials / threads_num; ct++)
+#ifdef mutex
+	for (size_t ct = 0; ct < trials_per_thread; ct++)
 	{
-		sm4_crypt_enc(rk, input[i], input[i]);
+		sm4_crypt_enc(rk, input[i], output[i]);
 	}
+#else
+	for (size_t ct = 0; ct < trials_per_thread; ct++)
+	{
+		sm4_crypt_enc(rk, input, input);
+	}
+#endif
+
 }
+
+
 
 int main(int argc, char** argv)
 {
+
+
+	uint32_t p0 = 0x01234567;
+	uint32_t p1 = 0x89abcdef;
+	uint32_t p2 = 0xfedcba98;
+	uint32_t p3 = 0x76543210;
 
 	for (size_t id = 0; id < threads_num; id++)
 	{
 		for (size_t i = 0; i < 32; )
 		{
-			input[id][i++] = 0x01234567;
-			input[id][i++] = 0x89abcdef;
-			input[id][i++] = 0xfedcba98;
-			input[id][i++] = 0x76543210;
+#ifdef mutex
+			input[id][i++] = (p0++) + id;
+			input[id][i++] = (p1++) + id;
+			input[id][i++] = (p2++) + id;
+			input[id][i++] = (p3++) + id;
+#else
+			input[i++] = 0x01234567;
+			input[i++] = 0x89abcdef;
+			input[i++] = 0xfedcba98;
+			input[i++] = 0x76543210;
+#endif
 		}
 	}
+
 
 	sm4_gen_rk(rk, key);
 
@@ -267,15 +301,26 @@ int main(int argc, char** argv)
 	}
 
 	for (size_t i = 0; i < threads_num; i++)
+	{
 		threads_lst[i].join();
+	}
+
 
 	auto t2{ std::chrono::system_clock::now() };
+
 	double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() * 1e-9;
 
-	// dump_wx(input);
-	constexpr size_t con_trials = trials * 8;
-	printf("Total Time:%.9fs\n\n", duration);
-	printf("Latency:%.9fs\n\n", duration / double(con_trials));
-	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(con_trials) / duration / 1024 / 1024);
+	for (size_t j = 0; j < 8; j++)
+	{
+		for (size_t i = 0; i < 4; i++)
+		{
+			printf("0x%08x ", output[0][j * 4 + i]);
+		}
+		dz;
+	}
 
+	printf("The encrpt times:%lld\n\n", trials);
+	printf("Total Time:%.9fs\n\n", duration);
+	printf("Latency:%.9fs\n\n", duration / double(trials));
+	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(trials) / duration / 1024 / 1024);
 }

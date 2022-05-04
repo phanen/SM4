@@ -1,9 +1,16 @@
 //
 //
+///*	OPTIMIZATION:
+//*	- multithread
+//*	- look up table
+//*/
 //
 //// NOTE: THIS IMPLEMENTATION BASE ON LE ASSUMPRION
 //// your machine should be LE
 //
+//
+//#include <thread>
+//#include <vector>
 //#include "sm4.h"
 //#include "lkup_table.h"
 //
@@ -14,23 +21,8 @@
 //}
 //
 //
-////static inline uint32_t sm4_func_T(uint8_t* p)
-////{
-////	uint32_t T0 = Table0[*p];
-////	uint32_t T1 = Table1[*(p + 1)];
-////	uint32_t T2 = Table2[*(p + 2)];
-////	uint32_t T3 = Table3[*(p + 3)];
-////	return (T3 ^ T2) ^ (T1 ^ T0);
-////}
-//
-//
 //static inline uint32_t sm4_func_T(uint32_t in)
 //{
-//	//uint32_t T3 = Table3[uint8_t(in >> 24)];
-//	//uint32_t T2 = Table2[uint8_t(in >> 16)];
-//	//uint32_t T1 = Table1[uint8_t(in >> 8)];
-//	//uint32_t T0 = Table0[uint8_t(in)];
-//
 //	uint8_t* p = (uint8_t*)&in;
 //	uint32_t T0 = Table0[*(p)];
 //	uint32_t T1 = Table1[*(p + 1)];
@@ -48,22 +40,6 @@
 //	uint32_t T3 = T3_key[*(p + 3)];
 //	return (T3 ^ T2) ^ (T1 ^ T0);
 //}
-//
-//
-////static inline uint32_t sm4_func_T(uint32_t in)
-////{
-////	uint32_t s_o = 0, c = 0;
-////
-////	// non-linear func-tau
-////	s_o |= sm4_Sbox_get(uint8_t(in >> 24)) << 24;
-////	s_o |= sm4_Sbox_get(uint8_t(in >> 16)) << 16;
-////	s_o |= sm4_Sbox_get(uint8_t(in >> 8)) << 8;
-////	s_o |= sm4_Sbox_get(uint8_t(in));
-////
-////	// linear func-L 
-////	return s_o ^ (ROT_SHL(s_o, 2)) ^ (ROT_SHL(s_o, 10)) ^ (ROT_SHL(s_o, 18)) ^ (ROT_SHL(s_o, 24));
-////
-////}
 //
 ////static inline uint32_t sm4_func_T_key(uint32_t in)
 ////{
@@ -187,41 +163,79 @@
 //}
 //
 //
+//
+//
+//constexpr size_t threads_num = 16;
+//constexpr size_t trials_per_thread = 10000000;
+//constexpr size_t trials = threads_num * trials_per_thread;
+//
+//
+//uint32_t key[4]{ 0x01234567,0x89abcdef,0xfedcba98,0x76543210 };
+//uint32_t rk[32]{};
+//
+////std::vector<uint32_t[4]> input(threads_num, { 0x01234567,0x89abcdef,0xfedcba98,0x76543210 });
+////std::vector<uint32_t[4]> output(threads_num, { });
+//
+//uint32_t input[threads_num][4]{};
+//uint32_t output[threads_num][4]{};
+//
+//void task(int i) {
+//	for (size_t ct = 0; ct < trials_per_thread; ct++)
+//	{
+//		sm4_crypt_enc(rk, input[i], input[i]);
+//	}
+//}
+//
+//
+//
 //int main(int argc, char** argv)
 //{
-//	uint32_t key[4] = { 0x01234567,0x89abcdef,0xfedcba98,0x76543210 };
-//	uint32_t input[4] = { 0x01234567,0x89abcdef,0xfedcba98,0x76543210 };
-//	uint32_t output[4]{};
-//	uint32_t rk[32];
+//	for (size_t i = 0; i < threads_num; i++)
+//	{
+//		input[i][0] = 0x01234567;
+//		input[i][1] = 0x89abcdef;
+//		input[i][2] = 0xfedcba98;
+//		input[i][3] = 0x76543210;
+//	}
 //
 //
-//	dump_bx(key, sizeof(key[4]) * 4);
+//	//for (size_t i = 0; i < threads_num; i++)
+//	//{
+//	//	for (size_t j = 0; j < 4; j++)
+//	//		printf("0x%08x ", input[i][j]);
+//	//	dz;
+//	//}
 //
-//	// generate 32 rounds' sub-key 
 //	sm4_gen_rk(rk, key);
 //
+//	std::vector<std::thread> threads_lst;
 //
-//	//dump_bx(rk, 32);
-//	sm4_crypt_enc(rk, input, output);
-//
-//
-//	dump_bx(output, 16);
-//
-//
-//	size_t ct = 0, trials = 1000000;
 //	auto t1{ std::chrono::system_clock::now() };
-//	while (ct < trials)
+//
+//	for (size_t i = 0; i < threads_num; i++)
 //	{
-//		sm4_crypt_enc(rk, input, input);
-//		ct++;
+//		threads_lst.emplace_back(
+//			std::thread(task, i)
+//		);
 //	}
+//
+//	for (size_t i = 0; i < threads_num; i++)
+//		threads_lst[i].join();
+//
 //	auto t2{ std::chrono::system_clock::now() };
 //	double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count() * 1e-9;
 //
-//	dump_bx(input, 16); dz;
 //
+//	//for (size_t i = 0; i < threads_num; i++)
+//	//{
+//	//	for (size_t j = 0; j < 4; j++)
+//	//		printf("0x%08x ", input[i][j]);
+//	//	dz;
+//	//}
+//
+//
+//	printf("The encrpt times:%lld\n\n", trials);
 //	printf("Total Time:%.9fs\n\n", duration);
 //	printf("Latency:%.9fs\n\n", duration / double(trials));
 //	printf("Thoughoutput:%.9f MB/s \n\n", 16 * double(trials) / duration / 1024 / 1024);
-//
 //}
